@@ -52,22 +52,19 @@ class TodoController extends TelegramNodeBot.TelegramBaseController {
   *
   */
   checkHandler($) {
-    let index;
-    try {
-      index = $.message.text.split(' ').slice(1)[0];
-    } catch (error) {
-      return $.sendMessage('Sorry, please enter valid index');
-    }
+    const index = parseInt($.message.text.split(' ').slice(1)[0]);
+    if (isNaN(index)) return $.sendMessage('Sorry, please enter valid index');
+
 
     $.getUserSession('todos')
         .then((todos) => {
           console.log(todos);
-          todos.splice(index, 1);
+          todos.splice(index-1, 1);
           $.setUserSession('todos', todos);
           $.sendMessage('checked');
         })
         .catch((err) => {
-          console.log(err);
+          return $.sendMessage('Sorry, please enter valid index');
         });
   }
 
@@ -89,7 +86,7 @@ class TodoController extends TelegramNodeBot.TelegramBaseController {
    * @return {String} serialized text.
    */
   _serializeList(todoList) {
-    let serialized = ' *Your todos:* \n\n ';
+    let serialized = ' *Your todos:* \n\n';
     todoList.forEach((todo, i) => {
       serialized += `*${i + 1}* - ${todo} \n`;
     });
